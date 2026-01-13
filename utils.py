@@ -40,7 +40,7 @@ def extract_resume_data(text, api_key):
     try:
         genai.configure(api_key=api_key)
         # Use 1.5-flash for speed and JSON capabilities
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.0-flash')
         
         prompt = f"""
         Act as a senior HR Recruiter. Analyze the resume text below.
@@ -70,4 +70,5 @@ def extract_resume_data(text, api_key):
         return json.loads(response_text)
         
     except Exception as e:
+
         return {"error": str(e)}
