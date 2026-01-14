@@ -20,11 +20,10 @@ st.set_page_config(
 def download_nltk_stopwords():
     try:
         nltk.data.find('corpora/stopwords')
-    except nltk.downloader.DownloadError:
+    except LookupError:  # <--- This is the correct error to catch
         nltk.download('stopwords', quiet=True)
 
 download_nltk_stopwords()
-
 # --- Load Models (SVM) ---
 MODEL_DIR = "saved_models"
 TFIDF_PATH = os.path.join(MODEL_DIR, "tfidf_vectorizer.joblib")
@@ -160,3 +159,4 @@ if analyze_button:
     # Raw Data Expander
     with st.expander("📄 View Extracted Text"):
         st.text(raw_text)
+
