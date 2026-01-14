@@ -41,22 +41,48 @@ def extract_resume_data(text, api_key):
         genai.configure(api_key=api_key)
         # Use 1.5-flash for speed and JSON capabilities
         model = genai.GenerativeModel('gemini-3-flash-preview')
-        
         prompt = f"""
-        Act as a senior HR Recruiter. Analyze the resume text below.
-        
+        You are a strict, senior HR recruiter with limited time.
+        Analyze the resume objectively. No assumptions, no kindness.
+
         Resume Text:
         {text}
-        
-        Extract the following details and return strictly valid JSON:
-        1. "category": The best fitting job role (e.g., Data Scientist, React Developer, HR).
-        2. "experience_years": Total years of experience (numeric value, e.g., 2.5). Use 0 if not found.
-        3. "skills": A list of top 5 technical skills found.
-        4. "rating": A score from 1-10 based on content quality.
-        5. "summary": A 2-sentence summary of the candidate.
-        
-        Return ONLY the JSON. No markdown formatting.
+
+        Your task:
+        - Judge the resume ONLY on what is clearly written.
+        - Do not infer skills or experience that are not explicitly mentioned.
+        - Penalize vague content, buzzwords, weak descriptions, and poor structure.
+
+        Extract and return STRICTLY valid JSON with these fields:
+
+        1. "category":
+           - The single most suitable job role based ONLY on skills and experience.
+           - If unclear, return "Unclear / Generic Profile".
+
+        2. "experience_years":
+           - Total years of professional experience as a numeric value.
+           - If not clearly mentioned, return 0.
+
+        3. "skills":
+           - Top 5 clearly mentioned technical skills.
+           - Do NOT guess or add related skills.
+
+        4. "rating":
+           - Score from 1 to 10.
+           - 1–3: weak, irrelevant, or poorly written resume
+           - 4–6: average, some substance but gaps
+           - 7–8: strong and relevant
+           - 9–10: exceptional and well-documented
+           - Be conservative. High scores must be justified by content.
+
+        5. "summary":
+           - 2 short, factual sentences.
+           - Mention strengths AND gaps if present.
+
+        Return ONLY raw JSON.
+        No explanations. No markdown. No extra text.
         """
+
         
         response = model.generate_content(prompt)
         response_text = response.text
@@ -72,4 +98,5 @@ def extract_resume_data(text, api_key):
     except Exception as e:
 
         return {"error": str(e)}
+
 
